@@ -21,6 +21,16 @@ jobs:
         with:
           python-version: '3.9'
 
+      # 缓存 pip 依赖
+      - name: Cache pip dependencies
+        id: pip-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
       # 安装依赖
       - name: Install dependencies
         run: |
