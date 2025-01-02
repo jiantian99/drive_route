@@ -1,0 +1,39 @@
+name: Run Route Plan Script
+
+on:
+  schedule:
+    # 每天 UTC 时间 8:00 运行（北京时间 16:00）
+    - cron: '0 8 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 设置 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      # 安装依赖
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      # 运行脚本
+      - name: Run route plan script
+        env:
+          BAIDU_MAP_AK: ${{ secrets.BAIDU_MAP_AK }}
+          WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
+          ROUTE_ORIGIN: ${{ secrets.ROUTE_ORIGIN }}
+          ROUTE_DESTINATION: ${{ secrets.ROUTE_DESTINATION }}
+          ROUTE_WAYPOINTS: ${{ secrets.ROUTE_WAYPOINTS }}
+        run: |
+          python route_plan.py
