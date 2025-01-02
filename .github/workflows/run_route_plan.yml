@@ -31,9 +31,9 @@ jobs:
       - name: Run route plan script
         env:
           BAIDU_MAP_AK: ${{ secrets.BAIDU_MAP_AK }}
-          WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
+          WECHAT_WEBHOOK_KEY: ${{ secrets.WECHAT_WEBHOOK_KEY }}
           ROUTE_ORIGIN: ${{ secrets.ROUTE_ORIGIN }}
           ROUTE_DESTINATION: ${{ secrets.ROUTE_DESTINATION }}
           ROUTE_WAYPOINTS: ${{ secrets.ROUTE_WAYPOINTS }}
         run: |
-          python route_plan.py
+          python drive_planning.py
