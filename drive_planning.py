@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
     if main_route_info:
         message = (
-            f"环城路通勤\n"
+            f"今日通勤信息\n"
             f"时间：{main_route_info['duration']} 分钟\n"
             f"距离：{main_route_info['distance']} 公里\n"
             f"灯数：{main_route_info['traffic_lights']}"
