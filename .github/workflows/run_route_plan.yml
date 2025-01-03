@@ -1,9 +1,10 @@
 name: Run Route Plan Script
 
 on:
-  schedule:
-    # 每天 UTC 时间 23:20 运行（北京时间 07:20）
-    - cron: '20 23 * * *'
+#  schedule:
+#    # 注释不使用schedule，改用cron-job.org调用
+#    # 每天 UTC 时间 23:20 运行（北京时间 07:20）
+#    - cron: '20 23 * * *'
   workflow_dispatch: # 允许手动触发
 
 jobs:
@@ -11,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 输出当前时间
+      - name: Print current time
+        run: date
       # 检出代码
       - name: Checkout repository
         uses: actions/checkout@v3
