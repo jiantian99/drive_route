@@ -1,0 +1,11 @@
+# 忽略本地测试文件
+run.bat
+run.sh
+.env
+
+# 忽略 Python 相关文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python 
