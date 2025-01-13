@@ -6,14 +6,20 @@ import pytz
 
 def is_holiday():
     """
-    检查今天是否是中国节假日（基于中国时区）
-    :return: 是否为节假日的布尔值
+    检查今天是否是中国节假日或周末（基于中国时区）
+    :return: 是否为节假日/周末的布尔值
     """
     # 使用中国时区获取当前日期
     china_tz = pytz.timezone('Asia/Shanghai')
     now = datetime.now(china_tz)
     today = now.strftime('%Y-%m-%d')
     year = now.year
+    
+    # 检查是否为周末（周六为5，周日为6）
+    is_weekend = now.weekday() >= 5
+    if is_weekend:
+        print(f"今天({today})是周末")
+        return True
     
     # 使用 PublicHolidays 端点获取中国节假日
     url = f"https://date.nager.at/api/v3/PublicHolidays/{year}/CN"
@@ -23,16 +29,12 @@ def is_holiday():
         if response.status_code == 200:
             holidays = response.json()
             # 检查今天是否在节假日列表中
-            # 输出节假日信息并优化返回值
-            if response.status_code == 200:
-                holidays = response.json()
-                is_holiday = any(holiday['date'] == today for holiday in holidays)
-                if is_holiday:
-                    print(f"今天({today})是节假日")
-                else:
-                    print(f"今天({today})是工作日")
-                return is_holiday
-            return any(holiday['date'] == today for holiday in holidays)
+            is_holiday = any(holiday['date'] == today for holiday in holidays)
+            if is_holiday:
+                print(f"今天({today})是节假日")
+            else:
+                print(f"今天({today})是工作日")
+            return is_holiday
         else:
             print(f"节假日查询失败，状态码：{response.status_code}")
             return False
