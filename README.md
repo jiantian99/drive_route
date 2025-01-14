@@ -25,62 +25,28 @@
 
 在GitHub仓库的`Settings -> Secrets and variables -> Actions`中，添加以下环境变量：
 
-必需变量：
+必需变量（需要在 Secrets 中设置）：
 - `BAIDU_MAP_AK`: 百度地图API密钥
 - `WECHAT_WEBHOOK_KEY`: 企业微信机器人的Webhook Key
 - `ROUTE_ORIGIN`: 起点的经纬度，格式为`纬度,经度`
 - `ROUTE_DESTINATION`: 终点的经纬度，格式为`纬度,经度`
 
-可选变量：
+可选变量（需要在 Secrets 中设置）：
 - `ROUTE_WAYPOINTS`: 途径点的经纬度，多个途径点用竖线`|`分隔
+
+配置参数（在 workflow 文件中直接设置）：
 - `RUN_MODE`: 运行模式
-  - `0`: 默认模式，每天执行（默认值）
-  - `1`: 节假日跳过模式，节假日不执行
+  - `0`: 默认模式，每天执行
+  - `1`: 节假日跳过模式，工作日执行（当前设置）
 - `DURATION_THRESHOLD`: 通勤时间阈值（分钟）
-  - 默认值为0，表示始终发送通知
-  - 设置具体数值后，仅当预计通勤时间超过此阈值时才发送通知
+  - 设置为40分钟，仅当预计通勤时间超过此阈值时才发送通知
 
 ### 4. 配置GitHub Actions
 
-在仓库中创建`.github/workflows/run_script.yml`文件，内容如下：
-
-```yaml
-name: Run Route Plan Script
-
-on:
-  schedule:
-    - cron: '0 8 * * *'  # 每天8点运行
-  workflow_dispatch:  # 允许手动触发
-
-jobs:
-  run-script:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Run script
-      env:
-        BAIDU_MAP_AK: ${{ secrets.BAIDU_MAP_AK }}
-        WECHAT_WEBHOOK_KEY: ${{ secrets.WECHAT_WEBHOOK_KEY }}
-        ROUTE_ORIGIN: ${{ secrets.ROUTE_ORIGIN }}
-        ROUTE_DESTINATION: ${{ secrets.ROUTE_DESTINATION }}
-        ROUTE_WAYPOINTS: ${{ secrets.ROUTE_WAYPOINTS }}
-        RUN_MODE: ${{ secrets.RUN_MODE }}
-        DURATION_THRESHOLD: ${{ secrets.DURATION_THRESHOLD }}
-      run: python drive_planning.py
-```
+工作流配置文件`.github/workflows/run_route_plan.yml`已包含所有必要的设置，包括：
+- 定时任务配置
+- 环境变量设置
+- 运行模式和阈值设置
 
 ### 5. 运行说明
 

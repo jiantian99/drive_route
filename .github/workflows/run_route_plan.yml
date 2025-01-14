@@ -46,7 +46,7 @@ jobs:
           ROUTE_ORIGIN: ${{ secrets.ROUTE_ORIGIN }}
           ROUTE_DESTINATION: ${{ secrets.ROUTE_DESTINATION }}
           ROUTE_WAYPOINTS: ${{ secrets.ROUTE_WAYPOINTS }}
-          RUN_MODE: ${{ secrets.RUN_MODE }}
-          DURATION_THRESHOLD: ${{ secrets.DURATION_THRESHOLD }}
+          RUN_MODE: '1'  # 节假日跳过模式
+          DURATION_THRESHOLD: '40'  # 40分钟阈值
           PYTHONUNBUFFERED: 1  # 立即输出日志，不使用缓冲
         run: python drive_planning.py
