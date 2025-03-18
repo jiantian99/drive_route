@@ -42,7 +42,7 @@ def is_holiday():
         print(f"节假日查询出错：{str(e)}")
         return False
 
-def get_route_plan(api_key, origin, destination, waypoints):
+def get_route_plan_baidu(api_key, origin, destination, waypoints):
     """
     获取百度地图API的路线规划信息
     :param api_key: 百度地图API的密钥
@@ -123,7 +123,8 @@ def get_env_config():
     """
     return {
         "run_mode": int(os.getenv("RUN_MODE", "0")),
-        "ak": os.getenv("BAIDU_MAP_AK"),
+        "baidu_ak": os.getenv("BAIDU_MAP_AK"),
+        "gaode_ak": os.getenv("GAODE_MAP_AK"),
         "webhook_key": os.getenv("WECHAT_WEBHOOK_KEY"),
         "origin": os.getenv("ROUTE_ORIGIN"),
         "destination": os.getenv("ROUTE_DESTINATION"),
@@ -145,6 +146,59 @@ def format_route_message(route_info):
         f"灯数：{route_info['traffic_lights']}"
     )
 
+def get_route_plan_gaode(api_key, origin, destination, waypoints):
+    """
+    获取高德地图API的路线规划信息
+    :param api_key: 高德地图API的密钥
+    :param origin: 起点的经纬度，格式为"纬度,经度"
+    :param destination: 终点的经纬度，格式为"纬度,经度"
+    :param waypoints: 途径点的经纬度，多个途径点用竖线|分隔
+    :return: 包含距离、时间和红绿灯数的字典，若请求失败则返回None
+    """
+    url = "https://restapi.amap.com/v5/direction/driving?parameters"
+
+    params = {
+        "key": api_key,
+        "origin": origin,
+        "destination": destination,
+        "waypoints": waypoints,
+        "strategy": 2,
+        "output": "json",
+        "show_fields": "cost,tmcs"
+    }
+    response = requests.get(url, params=params)
+    result = response.json()
+    if result["status"] == '1':
+        route = result["route"]["paths"][0]
+        distance = int(route["distance"])
+        duration = int(route["cost"]["duration"])
+        traffic_lights = int(route["cost"]["traffic_lights"])
+        
+        return {
+            "distance": round(distance / 1000, 1),
+            "duration": round(duration / 60, 1),
+            "traffic_lights": traffic_lights
+        }
+    else:
+        print(f"高德地图API请求失败，错误信息：{result['info']}")
+        return None
+    
+
+
+def get_route_plan(config):
+    """
+    获取路线规划信息
+    :param config: 配置字典
+    :return: 路线规划信息字典
+    """
+    # 如果百度地图API密钥为空，则使用高德地图API
+    if not config["baidu_ak"]:
+        return get_route_plan_gaode(config["gaode_ak"], config["origin"], config["destination"], config["waypoints"])
+    elif config["baidu_ak"]:
+        return get_route_plan_baidu(config["baidu_ak"], config["origin"], config["destination"], config["waypoints"])
+    else:
+        return None
+
 
 if __name__ == "__main__":
     # 获取配置
@@ -156,12 +210,7 @@ if __name__ == "__main__":
         exit(0)
 
     # 获取路线规划信息
-    route_info = get_route_plan(
-        config["ak"],
-        config["origin"],
-        config["destination"],
-        config["waypoints"]
-    )
+    route_info = get_route_plan(config)
 
     if route_info:
         message = format_route_message(route_info)
