@@ -164,7 +164,7 @@ def get_route_plan_gaode(api_key, origin, destination, waypoints):
         "waypoints": waypoints,
         "strategy": 2,
         "output": "json",
-        "show_fields": "cost,tmcs"
+        "show_fields": "cost"
     }
     response = requests.get(url, params=params)
     result = response.json()
